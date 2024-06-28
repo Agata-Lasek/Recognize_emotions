@@ -1,0 +1,125 @@
+import os
+import librosa
+import numpy as np
+import tensorflow as tf
+from sklearn.preprocessing import LabelEncoder
+from keras.utils import to_categorical
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from keras.utils import Sequence
+
+# Function to normalize the volume of an audio signal
+def normalize_volume(signal, target_db=-20):
+    rms = np.sqrt(np.mean(signal**2))
+    current_db = 20 * np.log10(rms)
+    scalar = 10**((target_db - current_db) / 20)
+    return signal * scalar
+
+# Data generator class
+class DataGenerator(Sequence):
+    def __init__(self, directories, file_list, emotions=None, batch_size=32, max_pad_len=128, target_db=-20, shuffle=True):
+        self.directories = directories
+        self.file_list = file_list
+        self.emotions = emotions
+        self.batch_size = batch_size
+        self.max_pad_len = max_pad_len
+        self.target_db = target_db
+        self.shuffle = shuffle
+        self.on_epoch_end()
+
+    def __len__(self):
+        return int(np.floor(len(self.file_list) / self.batch_size))
+
+    def __getitem__(self, index):
+        indices = self.indices[index*self.batch_size:(index+1)*self.batch_size]
+        batch_files = [self.file_list[i] for i in indices]
+        X = self.__data_generation(batch_files)
+        if self.emotions:
+            y = [self.emotions[file] for file in batch_files]
+            return X, np.array(y)
+        else:
+            return X
+
+    def on_epoch_end(self):
+        self.indices = np.arange(len(self.file_list))
+        if self.shuffle:
+            np.random.shuffle(self.indices)
+
+    def __data_generation(self, batch_files):
+        X = []
+        for file in batch_files:
+            for directory in self.directories:
+                file_path = os.path.join(directory, file)
+                if os.path.exists(file_path):
+                    signal, sr = librosa.load(file_path, sr=None)
+                    signal = normalize_volume(signal, self.target_db)
+                    spectrogram = librosa.feature.melspectrogram(y=signal, sr=sr)
+                    log_spectrogram = librosa.power_to_db(spectrogram, ref=np.max)
+                    log_spectrogram = (log_spectrogram - np.mean(log_spectrogram)) / np.std(log_spectrogram)
+                    if log_spectrogram.shape[1] > self.max_pad_len:
+                        log_spectrogram = log_spectrogram[:, :self.max_pad_len]
+                    else:
+                        pad_width = self.max_pad_len - log_spectrogram.shape[1]
+                        log_spectrogram = np.pad(log_spectrogram, ((0, 0), (0, pad_width)), mode='constant')
+                    X.append(log_spectrogram)
+                    break
+        X = np.array(X)
+        X = np.expand_dims(X, axis=-1)
+        return X
+
+# Training directories
+sad_dir = r'C:/Users/agata/Desktop/Test_neuron/OAF_Sad'
+happy_dir = r'C:/Users/agata/Desktop/Test_neuron/OAF_happy'
+directories = [sad_dir, happy_dir]
+
+# Collect training files and emotions
+sad_files = [f for f in os.listdir(sad_dir) if f.endswith('.wav')]
+happy_files = [f for f in os.listdir(happy_dir) if f.endswith('.wav')]
+
+train_files = sad_files + happy_files
+train_emotions = {file: 'sad' for file in sad_files}
+train_emotions.update({file: 'happy' for file in happy_files})
+
+# Encode emotions
+emotion_encoder = LabelEncoder()
+encoded_emotions = emotion_encoder.fit_transform(list(train_emotions.values()))
+categorical_emotions = to_categorical(encoded_emotions)
+train_emotions_encoded = {file: categorical_emotions[i] for i, file in enumerate(train_files)}
+
+# Create training data generator
+train_generator = DataGenerator(directories, train_files, train_emotions_encoded, batch_size=16, target_db=-20)
+
+# Define the model
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 1)),
+    MaxPooling2D((2, 2)),
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(2, activation='softmax')
+])
+
+# Compile the model
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+history = model.fit(train_generator, epochs=20)
+
+# Test directory
+test_dir = r'C:/Users/agata/Desktop/Test_neuron/test_samples'
+test_files = [f for f in os.listdir(test_dir) if f.endswith('.wav')]
+
+# Create test data generator
+test_generator = DataGenerator([test_dir], test_files, batch_size=1, shuffle=False)
+
+# Predict emotions for test data
+predictions = model.predict(test_generator)
+
+# Convert predictions to emotions
+predicted_emotions = emotion_encoder.inverse_transform(np.argmax(predictions, axis=1))
+
+# Display results
+for i, emotion in enumerate(predicted_emotions):
+    print(f'File {test_files[i]}: {emotion}')
