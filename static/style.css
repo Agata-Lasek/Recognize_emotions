@@ -1,0 +1,64 @@
+/* Resetowanie marginesów i box-model */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Ustawienie tła na całą stronę */
+body, html {
+    height: 100%;
+    width: 100%;
+    background: url('2222.png') no-repeat center center fixed; /* Użycie lokalnego obrazu jako tła */
+    background-size: cover; /* Dopasowanie obrazu do rozmiaru ekranu */
+    overflow: hidden; /* Zapobiega przewijaniu */
+}
+
+
+/* Kontener na przycisk */
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Wyśrodkowanie przycisku */
+    text-align: center;
+}
+
+/* Przyciski w kształcie koła, bez ustawionej szerokości i wysokości */
+.circle-button {
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(145deg, #131313, #141414); /* Gradient 3D */
+    box-shadow: 10px 10px 20px #2c7abf, -10px -10px 20px #3fa6f7; /* Efekt wklęsłości */
+    color: white;
+    font-size: 50px; /* Powiększenie ikony */
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+/* Styl ikony */
+.circle-button i {
+    color: white; /* Kolor ikony */
+}
+
+/* Efekt hover dla przycisku */
+.circle-button:hover {
+    transform: scale(1.2); /* Powiększenie przycisku na hover */
+    box-shadow: 15px 15px 30px #2c7abf, -15px -15px 30px #3fa6f7; /* Zwiększony efekt 3D */
+}
+
+/* Efekt kliknięcia */
+.circle-button:active {
+    transform: scale(1.1); /* Lekko zmniejszamy po kliknięciu */
+    box-shadow: 5px 5px 15px #2c7abf, -5px -5px 15px #3fa6f7; /* Efekt nacisku */
+}
+
+/* Animacja przybliżenia i zaniku */
+.zoom-out {
+    transform: scale(8); /* Większe przybliżenie */
+    opacity: 0;
+    transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+}

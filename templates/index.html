@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microphone Button Animation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Dodanie Font Awesome -->
+</head>
+<body>
+    <div class="container">
+        <button id="startButton" class="circle-button">
+            <i class="fas fa-microphone"></i> <!-- Ikona mikrofonu -->
+        </button>
+    </div>
+
+    <script>
+        function resizeButton() {
+            const button = document.getElementById("startButton");
+            const minDimension = Math.min(window.innerWidth, window.innerHeight);
+            const buttonSize = minDimension / 3;  // 1/3 wielkości mniejszego wymiaru
+            button.style.width = buttonSize + 'px';
+            button.style.height = buttonSize + 'px';
+        }
+
+        // Usunięcie klasy zoom-out po załadowaniu strony
+        window.addEventListener('pageshow', function(event) {
+            const button = document.getElementById("startButton");
+            document.body.classList.remove("zoom-out"); // Usunięcie klasy zoom-out
+        });
+
+        // Wywołaj funkcję przy pierwszym załadowaniu strony
+        resizeButton();
+
+        // Wywołaj funkcję po każdej zmianie rozmiaru okna
+        window.addEventListener('resize', resizeButton);
+
+        // Obsługa kliknięcia i animacja
+        const button = document.getElementById("startButton");
+        button.addEventListener("click", function() {
+            document.body.classList.add("zoom-out");
+            setTimeout(function() {
+                window.location.href = "/next";
+            }, 1000);  // Czas na zakończenie animacji przed przekierowaniem
+        });
+    </script>
+</body>
+</html>
