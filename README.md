@@ -67,7 +67,7 @@ Aby zwiększyć różnorodność i odporność modelu:
 - **Normative Affect and Word List (NAWL)** – słowa z przypisanymi wartościami emocjonalnymi  
 - Link: (https://lobi.nencki.edu.pl/research/18/)
 ### Rozszerzenie form fleksyjnych z PELCRA
-- Analiza korpusu NKJP przez [PELCRA](http://pelcra.pl/)  
+- Analiza korpusu NKJP przez [PELCRA](https://nkjp.pl/)  
 - Dodanie najczęstszych form odmienionych do bazy  
 
 ### Łączenie wyników akustycznych i tekstowych
