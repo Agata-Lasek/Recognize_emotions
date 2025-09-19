@@ -1,4 +1,4 @@
-# Rozpoznawanie Emocji w Mowie
+# Aplikacja do analizy mowy, rozpoznawania emocji i generowania stosownej odpowiedzi
 
 ## Opis projektu
 Celem projektu było zaprojektowanie i zaimplementowanie aplikacji webowej, która rozpoznaje emocje użytkownika na podstawie sygnału mowy. 
