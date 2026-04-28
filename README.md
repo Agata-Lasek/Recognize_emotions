@@ -18,7 +18,7 @@ Aplikacja integruje rozpoznawanie mowy oraz analizę tekstu, co pozwala na bardz
 ## Dane wejściowe i ich przygotowanie
 
 ### Zestaw nEMO
-- Źródło: dane z [Hugging Face – nEMO Dataset](https://huggingface.co/datasets/amu-cai/nEMO)
+- Źródło: [nEMO Dataset](https://huggingface.co/datasets/amu-cai/nEMO)
 - Autor: Christop, Iwona
 - Licencja: Creative Commons CC BY-NC-SA 4.0  
 - Zawartość: ~3h nagrań (9 lektorów, 6 emocji, ~700 próbki/emocję)  
